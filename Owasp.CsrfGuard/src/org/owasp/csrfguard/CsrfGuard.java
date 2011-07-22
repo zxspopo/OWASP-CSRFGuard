@@ -64,6 +64,8 @@ public final class CsrfGuard implements Serializable {
 	
 	private String newTokenLandingPage = null;
 	
+	private boolean useNewTokenLandingPage = false;
+	
 	private boolean ajax = false;
 	
 	private String sessionKey = null;
@@ -91,6 +93,12 @@ public final class CsrfGuard implements Serializable {
 		csrfGuard.setTokenPerPage(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.TokenPerPage", "false")));
 		csrfGuard.setPrng(SecureRandom.getInstance(properties.getProperty("org.owasp.csrfguard.PRNG", "SHA1PRNG")));
 		csrfGuard.setNewTokenLandingPage(properties.getProperty("org.owasp.csrfguard.NewTokenLandingPage"));
+		//default to false if newTokenLandingPage is not set; default to true if set.
+		if (csrfGuard.getNewTokenLandingPage() == null) {
+			csrfGuard.setUseNewTokenLandingPage(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.UseNewTokenLandingPage", "false")));
+		} else {
+			csrfGuard.setUseNewTokenLandingPage(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.UseNewTokenLandingPage", "true")));
+		}
 		csrfGuard.setSessionKey(properties.getProperty("org.owasp.csrfguard.SessionKey", "OWASP_CSRFGUARD_KEY"));
 		csrfGuard.setAjax(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.Ajax", "false")));
 
@@ -225,6 +233,14 @@ public final class CsrfGuard implements Serializable {
 
 	public void setNewTokenLandingPage(String newTokenLandingPage) {
 		this.newTokenLandingPage = newTokenLandingPage;
+	}
+	
+	public boolean isUseNewTokenLandingPage() {
+		return useNewTokenLandingPage;
+	}
+
+	public void setUseNewTokenLandingPage(boolean useNewTokenLandingPage) {
+		this.useNewTokenLandingPage = useNewTokenLandingPage;
 	}
 
 	public boolean isAjaxEnabled() {
