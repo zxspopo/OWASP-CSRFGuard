@@ -80,7 +80,9 @@ public final class CsrfGuardFilter implements Filter {
 						location = filterConfig.getServletContext().getContextPath() + "/" + location;
 					}
 					
-					String tokenValue = csrfGuard.getTokenValue(httpRequest, location);
+					//remove any query parameters from the location
+					String locationUri = location.split("\\?", 2)[0];
+					String tokenValue = csrfGuard.getTokenValue(httpRequest, locationUri);
 					redirectResponse.sendRedirect(location, csrfGuard.getTokenName(), tokenValue);
 				} else {
 					csrfGuard.getLogger().log(String.format("CsrfGuard skipping redirect token injection for location %s", location));
