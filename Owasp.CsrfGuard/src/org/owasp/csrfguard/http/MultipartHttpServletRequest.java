@@ -84,8 +84,9 @@ public class MultipartHttpServletRequest extends HttpServletRequestWrapper {
 		return values;
 	}
 	
-	@Override
-	public Map<String, List<String>> getParameterMap() {
-		return Collections.unmodifiableMap(parameters);
-	}
+	//Does not compile
+//	@Override
+//	public Map<String, List<String>> getParameterMap() {
+//		return Collections.unmodifiableMap(parameters);
+//	}
 }
