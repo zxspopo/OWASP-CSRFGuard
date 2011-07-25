@@ -56,11 +56,11 @@ public final class CsrfGuardFilter implements Filter {
 			CsrfGuard csrfGuard = (CsrfGuard)session.getAttribute(CsrfGuard.SESSION_KEY);
 			csrfGuard.getLogger().log(String.format("CsrfGuard analyzing request %s", httpRequest.getRequestURI()));
 			
-			if(MultipartHttpServletRequest.isMultipartRequest(httpRequest)) {
-				httpRequest = new MultipartHttpServletRequest(httpRequest);
-			}
+//			if(MultipartHttpServletRequest.isMultipartRequest(httpRequest)) {
+//				httpRequest = new MultipartHttpServletRequest(httpRequest);
+//			}
 			
-			if(session.isNew()) {
+			if(session.isNew() && csrfGuard.isUseNewTokenLandingPage() ) {
 				csrfGuard.writeLandingPage(httpRequest, redirectResponse);
 			} else if(csrfGuard.isValidRequest(httpRequest, redirectResponse)) {
 				filterChain.doFilter(httpRequest, redirectResponse);
@@ -80,7 +80,9 @@ public final class CsrfGuardFilter implements Filter {
 						location = filterConfig.getServletContext().getContextPath() + "/" + location;
 					}
 					
-					String tokenValue = csrfGuard.getTokenValue(httpRequest, location);
+					//remove any query parameters from the location
+					String locationUri = location.split("\\?", 2)[0];
+					String tokenValue = csrfGuard.getTokenValue(httpRequest, locationUri);
 					redirectResponse.sendRedirect(location, csrfGuard.getTokenName(), tokenValue);
 				} else {
 					csrfGuard.getLogger().log(String.format("CsrfGuard skipping redirect token injection for location %s", location));
