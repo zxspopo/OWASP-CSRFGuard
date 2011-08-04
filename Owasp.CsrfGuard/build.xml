@@ -12,7 +12,6 @@
 		<property name="dist.dir" location="${basedir}/dist" />
 		<property name="lib.dir" location="${basedir}/lib" />
 		<property name="conf.dir" location="${basedir}/conf"/>
-		<property name="tomcat.dir" location="/Users/esheridan/Programs/Apache/Tomcat/6.0.32/" />
 		<property name="license.file" location="${conf.dir}/License.txt" />
 		<property name="readme.file" location="${conf.dir}/Readme.txt" />
 		<property name="tld.file" location="${conf.dir}/Owasp.CsrfGuard.tld"/>
@@ -32,11 +31,6 @@
 		<javac deprecation="yes" destdir="${bin.dir}" listfiles="no" optimize="on" srcdir="${src.dir}" debug="on" source="1.5" target="1.5" includeantruntime="false">
 			<classpath>
 				<fileset dir="${lib.dir}">
-					<include name="**/*.jar" />
-				</fileset>
-			</classpath>
-			<classpath>
-				<fileset dir="${tomcat.dir}/lib">
 					<include name="**/*.jar" />
 				</fileset>
 			</classpath>
