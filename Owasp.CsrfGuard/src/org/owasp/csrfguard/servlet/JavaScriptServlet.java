@@ -151,6 +151,8 @@ public final class JavaScriptServlet extends HttpServlet {
 			response.setHeader("Cache-Control", cacheControl);
 		}
 
+		response.setContentType("text/javascript");
+
 		/** build dynamic javascript **/
 		String code = templateCode;
 
