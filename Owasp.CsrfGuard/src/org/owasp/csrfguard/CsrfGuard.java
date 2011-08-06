@@ -71,7 +71,9 @@ public final class CsrfGuard implements Serializable {
 	private String sessionKey = null;
 	
 	private Set<String> unprotectedPages = null;
-	
+
+	private Set<String> protectedMethods = null;
+
 	private List<IAction> actions = null;
 
 	public static CsrfGuard newInstance(InputStream inputStream) throws NoSuchAlgorithmException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
@@ -171,12 +173,19 @@ public final class CsrfGuard implements Serializable {
 			}
 		}
 
+		/** initialize protected methods **/
+		String methodList = (String)properties.getProperty("org.owasp.csrfguard.ProtectedMethods");
+		for (String method : methodList.split(",")) {
+			csrfGuard.getProtectedMethods().add(method);
+		}
+
 		return csrfGuard;
 	}
 
 	public CsrfGuard() {
 		actions = new ArrayList<IAction>();
 		unprotectedPages = new HashSet<String>();
+		protectedMethods = new HashSet<String>();
 	}
 
 	public ILogger getLogger() {
@@ -263,6 +272,11 @@ public final class CsrfGuard implements Serializable {
 		return unprotectedPages;
 	}
 
+	public Set<String> getProtectedMethods () {
+		return protectedMethods;
+	}
+
+
 	public List<IAction> getActions() {
 		return actions;
 	}
@@ -294,7 +308,7 @@ public final class CsrfGuard implements Serializable {
 	}
 	
 	public boolean isValidRequest(HttpServletRequest request, HttpServletResponse response) {
-		boolean valid = isUnprotectedPage(request.getRequestURI());
+		boolean valid = isUnprotectedPageOrMethod(request);
 		HttpSession session = request.getSession(true);
 		String tokenFromSession = (String) session.getAttribute(getSessionKey());
 
@@ -370,7 +384,7 @@ public final class CsrfGuard implements Serializable {
 				}
 
 				/** create token if it does not exist **/
-				if (!isUnprotectedPage(request.getRequestURI()) && !pageTokens.containsKey(request.getRequestURI())) {
+				if (!isUnprotectedPageOrMethod(request) && !pageTokens.containsKey(request.getRequestURI())) {
 					try {
 						pageTokens.put(request.getRequestURI(), RandomGenerator.generateRandomId(getPrng(), getTokenLength()));
 					} catch (Exception e) {
@@ -575,6 +589,20 @@ public final class CsrfGuard implements Serializable {
 		
 		return retval;
 	}
+
+	public boolean isUnprotectedMethod(String method) {
+		boolean retval = false;
+
+		if (!protectedMethods.isEmpty() && !protectedMethods.contains(method)) {
+				retval = true;
+		}
+
+		return retval;
+	}
+
+  public boolean isUnprotectedPageOrMethod(HttpServletRequest request) {
+    return (isUnprotectedPage(request.getRequestURI()) || isUnprotectedMethod(request.getMethod()));
+  }
 
 	/**
 	 * FIXME: taken from Tomcat - ApplicationFilterFactory
