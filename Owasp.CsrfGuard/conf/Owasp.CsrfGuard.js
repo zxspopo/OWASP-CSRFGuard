@@ -286,6 +286,7 @@
 			if(element.tagName.toLowerCase() == "form") {
 				if(%INJECT_FORMS% == true) {
 					injectTokenForm(element, tokenName, tokenValue, pageTokens);
+					injectTokenAttribute(element, "action", tokenName, tokenValue, pageTokens);
 				}
 				/** inject into attribute **/
 			} else if(%INJECT_ATTRIBUTES% == true) {
