@@ -60,6 +60,8 @@ public final class CsrfGuard implements Serializable {
 	
 	private boolean tokenPerPage = false;
 	
+	private boolean tokenPerPagePrecreate;
+	
 	private SecureRandom prng = null;
 	
 	private String newTokenLandingPage = null;
@@ -93,8 +95,10 @@ public final class CsrfGuard implements Serializable {
 		csrfGuard.setTokenLength(Integer.parseInt(properties.getProperty("org.owasp.csrfguard.TokenLength", "32")));
 		csrfGuard.setRotate(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.Rotate", "false")));
 		csrfGuard.setTokenPerPage(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.TokenPerPage", "false")));
+		csrfGuard.setTokenPerPagePrecreate(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.TokenPerPagePrecreate", "false")));
 		csrfGuard.setPrng(SecureRandom.getInstance(properties.getProperty("org.owasp.csrfguard.PRNG", "SHA1PRNG")));
 		csrfGuard.setNewTokenLandingPage(properties.getProperty("org.owasp.csrfguard.NewTokenLandingPage"));
+
 		//default to false if newTokenLandingPage is not set; default to true if set.
 		if (csrfGuard.getNewTokenLandingPage() == null) {
 			csrfGuard.setUseNewTokenLandingPage(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.UseNewTokenLandingPage", "false")));
@@ -175,8 +179,10 @@ public final class CsrfGuard implements Serializable {
 
 		/** initialize protected methods **/
 		String methodList = (String)properties.getProperty("org.owasp.csrfguard.ProtectedMethods");
-		for (String method : methodList.split(",")) {
-			csrfGuard.getProtectedMethods().add(method);
+		if (methodList != null && methodList.trim().length() != 0) {
+			for (String method : methodList.split(",")) {
+				csrfGuard.getProtectedMethods().add(method.trim());
+			}
 		}
 
 		return csrfGuard;
@@ -226,6 +232,14 @@ public final class CsrfGuard implements Serializable {
 
 	public void setTokenPerPage(boolean tokenPerPage) {
 		this.tokenPerPage = tokenPerPage;
+	}
+
+	public boolean isTokenPerPagePrecreate() {
+		return tokenPerPagePrecreate;
+	}
+
+	public void setTokenPerPagePrecreate(boolean tokenPerPagePrecreate) {
+		this.tokenPerPagePrecreate = tokenPerPagePrecreate;
 	}
 
 	public SecureRandom getPrng() {
@@ -295,7 +309,11 @@ public final class CsrfGuard implements Serializable {
 				Map<String, String> pageTokens = (Map<String, String>) session.getAttribute(CsrfGuard.PAGE_TOKENS_KEY);
 
 				if (pageTokens != null) {
+					if (isTokenPerPagePrecreate()) {
+						createPageToken(pageTokens,uri);
+					}
 					tokenValue = pageTokens.get(uri);
+					
 				}
 			}
 
@@ -384,16 +402,33 @@ public final class CsrfGuard implements Serializable {
 				}
 
 				/** create token if it does not exist **/
-				if (!isUnprotectedPageOrMethod(request) && !pageTokens.containsKey(request.getRequestURI())) {
-					try {
-						pageTokens.put(request.getRequestURI(), RandomGenerator.generateRandomId(getPrng(), getTokenLength()));
-					} catch (Exception e) {
-						throw new RuntimeException(String.format("unable to generate the random token - %s", e.getLocalizedMessage()), e);
-					}
+				if (!isUnprotectedPageOrMethod(request)) {
+					createPageToken(pageTokens, request.getRequestURI());
 				}
 			}
 		}
 	}
+	
+	/**
+	 * Create page token if it doesn't exist.
+	 * @param pageTokens A map of tokens. If token doesn't exist it will be added.
+	 * @param uri The key for the tokens.
+	 */
+	private void createPageToken(Map<String, String> pageTokens, String uri) {
+		
+		if(pageTokens == null)
+			return;
+		
+		/** create token if it does not exist **/
+		if (pageTokens.containsKey(uri))
+			return;
+		try {
+			pageTokens.put(uri, RandomGenerator.generateRandomId(getPrng(), getTokenLength()));
+		} catch (Exception e) {
+			throw new RuntimeException(String.format("unable to generate the random token - %s", e.getLocalizedMessage()), e);
+		}
+	}
+	
 	
 	public void writeLandingPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String landingPage = getNewTokenLandingPage();
