@@ -75,7 +75,7 @@ public final class CsrfGuardFilter implements Filter {
 			if(redirectResponse.getLocation() != null) {
 				String location = redirectResponse.getLocation();
 				
-				if(!location.contains("://") && !csrfGuard.isUnprotectedPage(location)) {
+				if(!location.contains("://") && !(csrfGuard.isUnprotectedPage(location) || csrfGuard.isUnprotectedMethod("GET"))) {
 					if(!location.startsWith("/")) {
 						location = filterConfig.getServletContext().getContextPath() + "/" + location;
 					}
