@@ -42,7 +42,7 @@ public final class CsrfGuardFilter implements Filter {
 	
 	@Override
 	public void destroy() {
-		/** nothing to do **/
+		filterConfig = null;
 	}
 
 	@Override
