@@ -34,7 +34,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.owasp.csrfguard.http.InterceptRedirectResponse;
-import org.owasp.csrfguard.http.MultipartHttpServletRequest;
+//import org.owasp.csrfguard.http.MultipartHttpServletRequest;
 
 public final class CsrfGuardFilter implements Filter {
 	
