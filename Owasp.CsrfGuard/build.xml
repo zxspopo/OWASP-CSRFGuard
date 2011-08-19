@@ -10,6 +10,8 @@
 		<property name="bin.dir" location="${basedir}/bin" />
 		<property name="src.dir" location="${basedir}/src" />
 		<property name="dist.dir" location="${basedir}/dist" />
+		<property name="dist.jar" location="${basedir}/dist/${project.name}.jar" />
+		<property name="dist.source.jar" location="${basedir}/dist/${project.name}-sources.jar" />
 		<property name="lib.dir" location="${basedir}/lib" />
 		<property name="conf.dir" location="${basedir}/conf"/>
 		<property name="license.file" location="${conf.dir}/License.txt" />
@@ -24,10 +26,10 @@
 
 	<target name="clean" depends="init" description="delete and create skeleton build directory">
 		<delete dir="${bin.dir}"/>
-		<mkdir dir="${bin.dir}"/>
 	</target>
 
-	<target name="compile" depends="clean" description="Compile the sources">
+	<target name="compile" depends="init" description="Compile the sources">
+		<mkdir dir="${bin.dir}"/>
 		<javac deprecation="yes" destdir="${bin.dir}" listfiles="no" optimize="on" srcdir="${src.dir}" debug="on" source="1.5" target="1.5" includeantruntime="false">
 			<classpath>
 				<fileset dir="${lib.dir}">
@@ -47,14 +49,14 @@
 	<target name="dist" depends="version,build" description="Build all distributables">
 		<replace file="${readme.file}" token="1.0.0.0" value="${project.version}.${build.number}" failOnNoReplacements="true" />
 
-		<jar basedir="${bin.dir}" jarfile="${dist.dir}/${project.name}.jar">
+		<jar basedir="${bin.dir}" jarfile="${dist.jar}">
 			<manifest>
 				<attribute name="Project-Lead" value="Eric Sheridan (eric.sheridan@owasp.org)"/>
 				<attribute name="Version" value="${project.version}.${build.number}"/>
 			</manifest>
 		</jar>
 
-		<jar basedir="${src.dir}" jarfile="${dist.dir}/${project.name}-sources.jar">
+		<jar basedir="${src.dir}" jarfile="${dist.source.jar}">
 			<manifest>
 				<attribute name="Project-Lead" value="Eric Sheridan (eric.sheridan@owasp.org)"/>
 				<attribute name="Version" value="${project.version}.${build.number}"/>
@@ -79,10 +81,12 @@
 		<copy toDir="${app.webinf.dir}/lib">
 			<fileset dir="${dist.dir}/lib">
 				<include name="**/*.jar" />
+				<exclude name="jsp-api-2.1.jar" />
+				<exclude name="servlet-api-2.5.jar" />
 			</fileset>
 		</copy>
 
-		<copy file="${dist.dir}/${project.name}.jar" toDir="${app.webinf.dir}/lib"/>
+		<copy file="${dist.jar}" toDir="${app.webinf.dir}/lib"/>
 		<copy file="${js.file}" toDir="${app.webinf.dir}"/>
 		<copy file="${props.file}" toDir="${app.webinf.dir}"/>
 	</target>
