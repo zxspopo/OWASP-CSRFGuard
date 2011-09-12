@@ -34,73 +34,54 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.owasp.csrfguard.http.InterceptRedirectResponse;
-import org.owasp.csrfguard.http.MultipartHttpServletRequest;
+//import org.owasp.csrfguard.http.MultipartHttpServletRequest;
 
 public final class CsrfGuardFilter implements Filter {
-	
+
 	private FilterConfig filterConfig = null;
-	
+
 	@Override
 	public void destroy() {
-		/** nothing to do **/
+		filterConfig = null;
 	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 		/** only work with HttpServletRequest objects **/
 		if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
-			HttpServletRequest httpRequest = (HttpServletRequest)request;
-			InterceptRedirectResponse redirectResponse = new InterceptRedirectResponse((HttpServletResponse)response);
+			HttpServletRequest httpRequest = (HttpServletRequest) request;
 			HttpSession session = httpRequest.getSession(true);
-			
+
 			CsrfGuard csrfGuard = (CsrfGuard)session.getAttribute(CsrfGuard.SESSION_KEY);
 			csrfGuard.getLogger().log(String.format("CsrfGuard analyzing request %s", httpRequest.getRequestURI()));
-			
-//			if(MultipartHttpServletRequest.isMultipartRequest(httpRequest)) {
-//				httpRequest = new MultipartHttpServletRequest(httpRequest);
-//			}
-			
-			if(session.isNew() && csrfGuard.isUseNewTokenLandingPage() ) {
-				csrfGuard.writeLandingPage(httpRequest, redirectResponse);
-			} else if(csrfGuard.isValidRequest(httpRequest, redirectResponse)) {
-				filterChain.doFilter(httpRequest, redirectResponse);
+
+			InterceptRedirectResponse httpResponse = new InterceptRedirectResponse((HttpServletResponse) response, httpRequest, csrfGuard);
+
+//			 if(MultipartHttpServletRequest.isMultipartRequest(httpRequest)) {
+//				 httpRequest = new MultipartHttpServletRequest(httpRequest);
+//			 }
+
+			if (session.isNew() && csrfGuard.isUseNewTokenLandingPage()) {
+				csrfGuard.writeLandingPage(httpRequest, httpResponse);
+			} else if (csrfGuard.isValidRequest(httpRequest, httpResponse)) {
+				filterChain.doFilter(httpRequest, httpResponse);
 			} else {
 				/** invalid request - nothing to do - actions already executed **/
 			}
-			
+
 			/** update tokens **/
 			csrfGuard.updateTokens(httpRequest);
-			
-			/** ensure token included in redirects **/
-			if(redirectResponse.getLocation() != null) {
-				String location = redirectResponse.getLocation();
-				
-				if(!location.contains("://") && !csrfGuard.isUnprotectedPage(location)) {
-					if(!location.startsWith("/")) {
-						location = filterConfig.getServletContext().getContextPath() + "/" + location;
-					}
-					
-					//remove any query parameters from the location
-					String locationUri = location.split("\\?", 2)[0];
-					String tokenValue = csrfGuard.getTokenValue(httpRequest, locationUri);
-					redirectResponse.sendRedirect(location, csrfGuard.getTokenName(), tokenValue);
-				} else {
-					csrfGuard.getLogger().log(String.format("CsrfGuard skipping redirect token injection for location %s", location));
-					
-					redirectResponse.getResponse().sendRedirect(location);
-				}
-			}
-			
+
 		} else {
 			filterConfig.getServletContext().log(String.format("[WARNING] CsrfGuard does not know how to work with requests of class %s ", request.getClass().getName()));
-			
+
 			filterChain.doFilter(request, response);
 		}
 	}
-	
+
 	@Override
 	public void init(@SuppressWarnings("hiding") FilterConfig filterConfig) throws ServletException {
 		this.filterConfig = filterConfig;
 	}
-	
+
 }
