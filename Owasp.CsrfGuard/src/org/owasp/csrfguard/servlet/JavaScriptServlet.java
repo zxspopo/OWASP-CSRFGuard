@@ -146,7 +146,9 @@ public final class JavaScriptServlet extends HttpServlet {
 
 		/** cannot cache if rotate or token-per-page is enabled **/
 		if (csrfGuard.isRotateEnabled() || csrfGuard.isTokenPerPageEnabled()) {
-			response.setHeader("Cache-Control", "no-store");
+			response.setHeader("Cache-Control", "no-cache, no-store");
+			response.setHeader("Pragma", "no-cache");
+			response.setHeader("Expires", "0");
 		} else {
 			response.setHeader("Cache-Control", cacheControl);
 		}
