@@ -51,14 +51,14 @@
 
 		<jar basedir="${bin.dir}" jarfile="${dist.jar}">
 			<manifest>
-				<attribute name="Project-Lead" value="Eric Sheridan (eric.sheridan@owasp.org)"/>
+				<attribute name="Project-Lead" value="Eric Sheridan (eric@infraredsecurity.com)"/>
 				<attribute name="Version" value="${project.version}.${build.number}"/>
 			</manifest>
 		</jar>
 
 		<jar basedir="${src.dir}" jarfile="${dist.source.jar}">
 			<manifest>
-				<attribute name="Project-Lead" value="Eric Sheridan (eric.sheridan@owasp.org)"/>
+				<attribute name="Project-Lead" value="Eric Sheridan (eric@infraredsecurity.com)"/>
 				<attribute name="Version" value="${project.version}.${build.number}"/>
 			</manifest>
 		</jar>
