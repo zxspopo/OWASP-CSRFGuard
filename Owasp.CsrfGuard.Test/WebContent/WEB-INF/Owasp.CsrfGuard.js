@@ -27,6 +27,55 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 (function() {
+	/**
+	 * Code to ensure our event always gets triggered when the DOM is updated.
+	 * @param obj
+	 * @param type
+	 * @param fn
+	 * @source http://www.dustindiaz.com/rock-solid-addevent/
+	 */
+	function addEvent( obj, type, fn ) {
+	    if (obj.addEventListener) {
+	        obj.addEventListener( type, fn, false );
+	        EventCache.add(obj, type, fn);
+	    }
+	    else if (obj.attachEvent) {
+	        obj["e"+type+fn] = fn;
+	        obj[type+fn] = function() { obj["e"+type+fn]( window.event ); }
+	        obj.attachEvent( "on"+type, obj[type+fn] );
+	        EventCache.add(obj, type, fn);
+	    }
+	    else {
+	        obj["on"+type] = obj["e"+type+fn];
+	    }
+	}
+	
+	var EventCache = function(){
+	    var listEvents = [];
+	    return {
+	        listEvents : listEvents,
+	        add : function(node, sEventName, fHandler){
+	            listEvents.push(arguments);
+	        },
+	        flush : function(){
+	            var i, item;
+	            for(i = listEvents.length - 1; i >= 0; i = i - 1){
+	                item = listEvents[i];
+	                if(item[0].removeEventListener){
+	                    item[0].removeEventListener(item[1], item[2], item[3]);
+	                };
+	                if(item[1].substring(0, 2) != "on"){
+	                    item[1] = "on" + item[1];
+	                };
+	                if(item[0].detachEvent){
+	                    item[0].detachEvent(item[1], item[2]);
+	                };
+	                item[0][item[1]] = null;
+	            };
+	        }
+	    };
+	}();
+	
 	/** string utility functions **/
 	String.prototype.startsWith = function(prefix) {
 		return this.indexOf(prefix) === 0;
@@ -332,26 +381,11 @@
 		
 		return pageTokens;
 	}
-
-	/** utility method to register window.onload **/
-	function addLoadEvent(func) {
-		var oldonload = window.onload;
-		
-		if (typeof window.onload != "function") {
-			window.onload = func;
-		} else {
-			window.onload = function() {
-				oldonload();
-				func();
-			}
-		}
-	}
-
+	
 	/**
 	 * Only inject the tokens if the JavaScript was referenced from HTML that
 	 * was served by us. Otherwise, the code was referenced from malicious HTML
-	 * which may be trying to steal tokens using JavaScript hijacking
-	 * techniques.
+	 * which may be trying to steal tokens using JavaScript hijacking techniques.
 	 */
 	if(isValidDomain(document.domain, "%DOMAIN_ORIGIN%")) {
 		/** optionally include Ajax support **/
@@ -371,7 +405,9 @@
 		}
 		
 		/** update nodes in DOM after load **/
-		addLoadEvent(function() {
+		addEvent(window,'unload',EventCache.flush);
+		addEvent(window,'load', function() {
+			alert('injecting tokens!');
 			injectTokens("%TOKEN_NAME%", "%TOKEN_VALUE%");
 		});
 	} else {

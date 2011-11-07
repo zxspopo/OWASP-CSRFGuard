@@ -56,7 +56,7 @@
 		</init-param>
 		<init-param>
 			<param-name>referer-pattern</param-name>
-			<param-value>.*10.0.0.104.*</param-value>
+			<param-value>http://localhost:8080.*</param-value>
 		</init-param>
 		<init-param>
 			<param-name>x-requested-with</param-name>
