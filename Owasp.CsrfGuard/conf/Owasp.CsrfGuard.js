@@ -1,6 +1,6 @@
 /**
  * The OWASP CSRFGuard Project, BSD License
- * Eric Sheridan (eric.sheridan@owasp.org), Copyright (c) 2011 
+ * Eric Sheridan (eric@infraredsecurity.com), Copyright (c) 2011 
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@
 	/** string utility functions **/
 	String.prototype.startsWith = function(prefix) {
 		return this.indexOf(prefix) === 0;
-	}
+	};
 
 	String.prototype.endsWith = function(suffix) {
 		return this.match(suffix+"$") == suffix;
@@ -43,7 +43,7 @@
 			this.url = url;
 			
 			this._open.apply(this, arguments);
-		}
+		};
 		
 		XMLHttpRequest.prototype._send = XMLHttpRequest.prototype.send;
 		XMLHttpRequest.prototype.send = function(data) {
@@ -52,7 +52,7 @@
 			}
 			
 			this._send.apply(this, arguments);
-		}
+		};
 	}
 
 	/** ie does not properly support prototype - wrap completely **/
@@ -105,7 +105,7 @@
 			}
 			
 			this.base.open(method, url, async, user, pass);
-		}
+		};
 		
 		init_XMLHttpRequest.prototype.send = function(data) {
 			if(this.onsend != null) {
@@ -113,23 +113,23 @@
 			}
 			
 			this.base.send(data);
-		}
+		};
 		
 		init_XMLHttpRequest.prototype.abort = function() {
 			this.base.abort();
-		}
+		};
 		
 		init_XMLHttpRequest.prototype.getAllResponseHeaders = function() {
 			return this.base.getAllResponseHeaders();
-		}
+		};
 		
 		init_XMLHttpRequest.prototype.getResponseHeader = function(name) {
 			return this.base.getResponseHeader(name);
-		}
+		};
 		
 		init_XMLHttpRequest.prototype.setRequestHeader = function(name, value) {
 			return this.base.setRequestHeader(name, value);
-		}
+		};
 		
 		/** hook **/
 		window.XMLHttpRequest = init_XMLHttpRequest;
@@ -165,7 +165,7 @@
 			var domain = "";
 			
 			/** parse up to end, first slash, or anchor **/
-			for(i=0; i<part.length; i++) {
+			for(var i=0; i<part.length; i++) {
 				var character = part.charAt(i);
 				
 				if(character == '/' || character == ':' || character == '#') {
