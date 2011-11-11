@@ -407,7 +407,6 @@
 		/** update nodes in DOM after load **/
 		addEvent(window,'unload',EventCache.flush);
 		addEvent(window,'load', function() {
-			alert('injecting tokens!');
 			injectTokens("%TOKEN_NAME%", "%TOKEN_VALUE%");
 		});
 	} else {
