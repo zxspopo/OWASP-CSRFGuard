@@ -36,11 +36,19 @@ function domTest() {
 
 	anchor = document.createElement('a');
 	anchor.setAttribute('href', 'protect.html');
+	anchor.appendChild(document.createTextNode('protect.html'));
+	
 	div.appendChild(anchor);
+	div.appendChild(document.createElement('br'));
+	div.appendChild(document.createElement('br'));
 	
 	anchor = document.createElement('a');
 	anchor.setAttribute('href', 'google.com');
+	anchor.appendChild(document.createTextNode('google.com'));
+	
 	div.appendChild(anchor);
+	div.appendChild(document.createElement('br'));
+	div.appendChild(document.createElement('br'));
 }
 
 </script>

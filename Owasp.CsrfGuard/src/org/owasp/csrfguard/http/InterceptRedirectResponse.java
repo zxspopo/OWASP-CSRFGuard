@@ -50,7 +50,7 @@ public class InterceptRedirectResponse extends HttpServletResponseWrapper {
 			sb.append(csrfGuard.getTokenName());
 			sb.append('=');
 			sb.append(csrfGuard.getTokenValue(request, locationUri));
-
+			
 			response.sendRedirect(sb.toString());
 		} else {
 			response.sendRedirect(location);
