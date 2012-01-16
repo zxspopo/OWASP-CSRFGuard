@@ -104,8 +104,7 @@ public final class JavaScriptServlet extends HttpServlet {
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		HttpSession session = request.getSession(true);
-		CsrfGuard csrfGuard = (CsrfGuard) session.getAttribute(CsrfGuard.SESSION_KEY);
+		CsrfGuard csrfGuard = CsrfGuard.getInstance();
 
 		if (csrfGuard != null && csrfGuard.isTokenPerPageEnabled()) {
 			writePageTokens(request, response);
@@ -142,7 +141,7 @@ public final class JavaScriptServlet extends HttpServlet {
 
 	private void writeJavaScript(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		HttpSession session = request.getSession(true);
-		CsrfGuard csrfGuard = (CsrfGuard) session.getAttribute(CsrfGuard.SESSION_KEY);
+		CsrfGuard csrfGuard = CsrfGuard.getInstance();
 
 		/** cannot cache if rotate or token-per-page is enabled **/
 		if (csrfGuard.isRotateEnabled() || csrfGuard.isTokenPerPageEnabled()) {

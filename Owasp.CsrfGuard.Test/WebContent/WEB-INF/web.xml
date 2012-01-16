@@ -22,7 +22,10 @@
 	</context-param>
 	
 	<listener>
-		<listener-class>org.owasp.csrfguard.CsrfGuardListener</listener-class>
+		<listener-class>org.owasp.csrfguard.CsrfGuardServletContextListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.owasp.csrfguard.CsrfGuardHttpSessionListener</listener-class>
 	</listener>
 	
 	<filter>

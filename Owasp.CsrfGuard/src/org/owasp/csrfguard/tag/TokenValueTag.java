@@ -40,8 +40,7 @@ public final class TokenValueTag extends AbstractUriTag {
 
 	@Override
 	public int doStartTag() {
-		HttpSession session = ((HttpServletRequest)pageContext.getRequest()).getSession(true);
-		CsrfGuard csrfGuard = (CsrfGuard) session.getAttribute(CsrfGuard.SESSION_KEY);
+		CsrfGuard csrfGuard = CsrfGuard.getInstance();
 
 		if (csrfGuard.isTokenPerPageEnabled() && getUri() == null) {
 			throw new IllegalStateException("must define 'uri' attribute when token per page is enabled");

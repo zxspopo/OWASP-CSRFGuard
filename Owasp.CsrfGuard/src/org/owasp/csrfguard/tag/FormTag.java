@@ -46,12 +46,12 @@ public final class FormTag extends AbstractUriTag implements DynamicAttributes {
 
 	@Override
 	public int doStartTag() {
-		HttpSession session = ((HttpServletRequest)pageContext.getRequest()).getSession(true);
-		CsrfGuard csrfGuard = (CsrfGuard) session.getAttribute(CsrfGuard.SESSION_KEY);
+		CsrfGuard csrfGuard = CsrfGuard.getInstance();
 		String tokenValue = csrfGuard.getTokenValue((HttpServletRequest) pageContext.getRequest(), buildUri(attributes.get("action")));
+		String tokenName = csrfGuard.getTokenName();
 
 		try {
-			pageContext.getOut().write(buildStartHtml(csrfGuard, tokenValue));
+			pageContext.getOut().write(buildStartHtml(tokenName, tokenValue));
 		} catch (IOException e) {
 			pageContext.getServletContext().log(e.getLocalizedMessage(), e);
 		}
@@ -75,7 +75,7 @@ public final class FormTag extends AbstractUriTag implements DynamicAttributes {
 		attributes.put(arg1.toLowerCase(), String.valueOf(arg2));
 	}
 
-	private String buildStartHtml(CsrfGuard csrfGuard, String tokenValue) {
+	private String buildStartHtml(String tokenName, String tokenValue) {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("<form ");
@@ -94,7 +94,7 @@ public final class FormTag extends AbstractUriTag implements DynamicAttributes {
 
 		sb.append('>');
 		sb.append("<input type=\"hidden\" name=\"");
-		sb.append(csrfGuard.getTokenName());
+		sb.append(tokenName);
 		sb.append("\" value=\"");
 		sb.append(tokenValue);
 		sb.append("\"");
