@@ -1,6 +1,6 @@
 OWASP CSRFGuard 1.0.0.0
 http://www.owasp.org/index.php/Category:OWASP_CSRFGuard_Project
-Eric Sheridan (eric.sheridan@owasp.org), Copyright (c) 2011
+Eric Sheridan (eric@infraredsecurity.com), Copyright (c) 2011
 BSD License, All rights reserved.
 
 == Overview ==
@@ -21,7 +21,7 @@ of referrer headers.
 
 == Project Lead ==
 
-Eric Sheridan (eric.sheridan@owasp.org) is the lead and primary developer of the OWASP CSRFGuard
+Eric Sheridan (eric@infraredsecurity.com) is the lead and primary developer of the OWASP CSRFGuard
 project. Aside from leading up CSRFGuard, Eric has contributed to or provided guidance
 on numerous other OWASP projects including WebGoat, Stinger, CSRFTester, and Enterprise Security
 API (ESAPI). He is an independent Application Security Consultant specializing in a wide variety of

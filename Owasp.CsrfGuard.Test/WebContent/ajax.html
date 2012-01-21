@@ -30,9 +30,30 @@ function sendForm() {
 
 	ajax('POST', 'protect.html', body);
 }
+
+function domTest() {
+	div = document.getElementById('ajax');
+
+	anchor = document.createElement('a');
+	anchor.setAttribute('href', 'protect.html');
+	anchor.appendChild(document.createTextNode('protect.html'));
+	
+	div.appendChild(anchor);
+	div.appendChild(document.createElement('br'));
+	div.appendChild(document.createElement('br'));
+	
+	anchor = document.createElement('a');
+	anchor.setAttribute('href', 'google.com');
+	anchor.appendChild(document.createTextNode('google.com'));
+	
+	div.appendChild(anchor);
+	div.appendChild(document.createElement('br'));
+	div.appendChild(document.createElement('br'));
+}
+
 </script>
 </head>
-<body>
+<body onload="javascript:domTest();">
 <h3>Test Link(s)</h3>
 <ul>
 	<li><a href="#" onclick="ajax('GET', 'protect.html', '')">protect.html</a></li>
@@ -46,6 +67,8 @@ function sendForm() {
 	<input id="text" type="text" name="text" value="text"/>
 	<input id="submit" type="submit" name="submit" value="submit" onclick="sendForm()"/>
 </form>
+<h3>Dom Test</h3>
+<div id="ajax"></div>
 </body>
 <!-- OWASP CSRFGuard Ajax Support -->
 <script src="/Owasp.CsrfGuard.Test/JavaScriptServlet"></script>

@@ -24,20 +24,20 @@ public class InterceptRedirectResponse extends HttpServletResponseWrapper {
 	}
 
 	@Override
-	public void sendRedirect(@SuppressWarnings("hiding") String location) throws IOException {
+	public void sendRedirect(String location) throws IOException {
 		/** ensure token included in redirects **/
 		if (!location.contains("://") && !(csrfGuard.isUnprotectedPage(location) || csrfGuard.isUnprotectedMethod("GET"))) {
 			/** update tokens **/
 			csrfGuard.updateTokens(request);
-
-			if (!location.startsWith("/")) {
-				location = request.getContextPath() + "/" + location;
-			}
-
+			
 			StringBuilder sb = new StringBuilder();
 
-			sb.append(location);
-
+			if (!location.startsWith("/")) {
+				sb.append(request.getContextPath() + "/" + location);
+			} else {
+				sb.append(location);
+			}
+			
 			if (location.contains("?")) {
 				sb.append('&');
 			} else {
@@ -50,7 +50,7 @@ public class InterceptRedirectResponse extends HttpServletResponseWrapper {
 			sb.append(csrfGuard.getTokenName());
 			sb.append('=');
 			sb.append(csrfGuard.getTokenValue(request, locationUri));
-
+			
 			response.sendRedirect(sb.toString());
 		} else {
 			response.sendRedirect(location);

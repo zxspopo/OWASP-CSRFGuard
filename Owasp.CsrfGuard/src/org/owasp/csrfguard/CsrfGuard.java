@@ -1,6 +1,6 @@
 /**
  * The OWASP CSRFGuard Project, BSD License
- * Eric Sheridan (eric.sheridan@owasp.org), Copyright (c) 2011 
+ * Eric Sheridan (eric@infraredsecurity.com), Copyright (c) 2011 
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -180,7 +180,7 @@ public final class CsrfGuard {
 		}
 
 		/** initialize protected methods **/
-		String methodList = (String)properties.getProperty("org.owasp.csrfguard.ProtectedMethods");
+		String methodList = properties.getProperty("org.owasp.csrfguard.ProtectedMethods");
 		if (methodList != null && methodList.trim().length() != 0) {
 			for (String method : methodList.split(",")) {
 				csrfGuard.getProtectedMethods().add(method.trim());
@@ -420,7 +420,6 @@ public final class CsrfGuard {
 			throw new RuntimeException(String.format("unable to generate the random token - %s", e.getLocalizedMessage()), e);
 		}
 	}
-
 
 	public void writeLandingPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String landingPage = getNewTokenLandingPage();
