@@ -48,6 +48,8 @@ public final class CsrfGuard implements Serializable {
 	
 	private final static String ACTION_PREFIX = "org.owasp.csrfguard.action.";
 	
+	private final static String PROTECTED_PAGE_PREFIX = "org.owasp.csrfguard.protected.";
+	
 	private final static String UNPROTECTED_PAGE_PREFIX = "org.owasp.csrfguard.unprotected.";
 	
 	private ILogger logger = null;
@@ -71,6 +73,8 @@ public final class CsrfGuard implements Serializable {
 	private boolean ajax = false;
 	
 	private String sessionKey = null;
+	
+	private Set<String> protectedPages = null;
 	
 	private Set<String> unprotectedPages = null;
 
@@ -160,9 +164,21 @@ public final class CsrfGuard implements Serializable {
 			throw new IOException("failure to define at least one action");
 		}
 
-		/** initialize unprotected pages **/
+		/** initialize protected, unprotected pages **/
 		for (Object obj : properties.keySet()) {
 			String key = (String) obj;
+			
+			if (key.startsWith(PROTECTED_PAGE_PREFIX)) {
+				String directive = key.substring(PROTECTED_PAGE_PREFIX.length());
+				int index = directive.indexOf('.');
+
+				/** page name/class **/
+				if (index < 0) {
+					String pageUri = properties.getProperty(key);
+					
+					csrfGuard.getProtectedPages().add(pageUri);
+				}
+			}
 
 			if (key.startsWith(UNPROTECTED_PAGE_PREFIX)) {
 				String directive = key.substring(UNPROTECTED_PAGE_PREFIX.length());
@@ -190,6 +206,7 @@ public final class CsrfGuard implements Serializable {
 
 	public CsrfGuard() {
 		actions = new ArrayList<IAction>();
+		protectedPages = new HashSet<String>();
 		unprotectedPages = new HashSet<String>();
 		protectedMethods = new HashSet<String>();
 	}
@@ -280,6 +297,10 @@ public final class CsrfGuard implements Serializable {
 
 	public void setSessionKey(String sessionKey) {
 		this.sessionKey = sessionKey;
+	}
+
+	public Set<String> getProtectedPages() {
+		return protectedPages;
 	}
 
 	public Set<String> getUnprotectedPages() {
@@ -459,7 +480,7 @@ public final class CsrfGuard implements Serializable {
 		sb.append("\");\r\n");
 
 		/** only include token if needed **/
-		if (!isUnprotectedPage(landingPage)) {
+		if (isProtectedPage(landingPage)) {
 			sb.append("var hiddenField = document.createElement(\"input\");\r\n");
 			sb.append("hiddenField.setAttribute(\"type\", \"hidden\");\r\n");
 			sb.append("hiddenField.setAttribute(\"name\", \"");
@@ -611,13 +632,20 @@ public final class CsrfGuard implements Serializable {
 			}
 		}
 	}
+	
+	public boolean isProtectedPage(String uri) {
+		boolean retval = protectedPages.size() == 0 ? true : false;
 
-	public boolean isUnprotectedPage(String uri) {
-		boolean retval = false;
-
+		for (String protectedPage : protectedPages) {
+			if (isUriMatch(protectedPage, uri)) {
+				retval = true;
+				break;
+			}
+		}
+		
 		for (String unprotectedPage : unprotectedPages) {
 			if (isUriMatch(unprotectedPage, uri)) {
-				retval = true;
+				retval = false;
 				break;
 			}
 		}
@@ -636,7 +664,7 @@ public final class CsrfGuard implements Serializable {
 	}
 
   public boolean isUnprotectedPageOrMethod(HttpServletRequest request) {
-    return (isUnprotectedPage(request.getRequestURI()) || isUnprotectedMethod(request.getMethod()));
+    return (!isProtectedPage(request.getRequestURI()) || isUnprotectedMethod(request.getMethod()));
   }
 
 	/**
