@@ -72,6 +72,8 @@ public final class CsrfGuard implements Serializable {
 	
 	private boolean ajax = false;
 	
+	private boolean protect = false;
+	
 	private String sessionKey = null;
 	
 	private Set<String> protectedPages = null;
@@ -111,6 +113,7 @@ public final class CsrfGuard implements Serializable {
 		}
 		csrfGuard.setSessionKey(properties.getProperty("org.owasp.csrfguard.SessionKey", "OWASP_CSRFGUARD_KEY"));
 		csrfGuard.setAjax(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.Ajax", "false")));
+		csrfGuard.setProtect(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.Protect", "false")));
 
 		/** first pass: instantiate actions **/
 		Map<String, IAction> actionsMap = new HashMap<String, IAction>();
@@ -289,6 +292,14 @@ public final class CsrfGuard implements Serializable {
 
 	public void setAjax(boolean ajax) {
 		this.ajax = ajax;
+	}
+
+	public boolean isProtectEnabled() {
+		return protect;
+	}
+
+	public void setProtect(boolean protect) {
+		this.protect = protect
 	}
 
 	public String getSessionKey() {
@@ -632,24 +643,24 @@ public final class CsrfGuard implements Serializable {
 			}
 		}
 	}
-	
-	public boolean isProtectedPage(String uri) {
-		boolean retval = protectedPages.size() == 0 ? true : false;
 
-		for (String protectedPage : protectedPages) {
-			if (isUriMatch(protectedPage, uri)) {
-				retval = true;
-				break;
+	public boolean isProtectedPage(String uri) {
+		boolean retval = !isProtectEnabled();
+
+		if (isProtectEnabled()) {
+			for (String protectedPage : protectedPages) {
+				if (isUriMatch(protectedPage, uri)) {
+					return true;
+				}
+			}
+		} else {
+			for (String unprotectedPage : unprotectedPages) {
+				if (isUriMatch(unprotectedPage, uri)) {
+					return false;
+				}
 			}
 		}
-		
-		for (String unprotectedPage : unprotectedPages) {
-			if (isUriMatch(unprotectedPage, uri)) {
-				retval = false;
-				break;
-			}
-		}
-		
+
 		return retval;
 	}
 
