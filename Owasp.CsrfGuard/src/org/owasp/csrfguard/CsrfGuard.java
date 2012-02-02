@@ -647,17 +647,19 @@ public final class CsrfGuard implements Serializable {
 	public boolean isProtectedPage(String uri) {
 		boolean retval = !isProtectEnabled();
 
-		if (isProtectEnabled()) {
-			for (String protectedPage : protectedPages) {
-				if (isUriMatch(protectedPage, uri)) {
-					return true;
-				}
+		for (String protectedPage : protectedPages) {
+			if (isUriExactMatch(protectedPage, uri)) {
+				return true;
+			} else if (isUriMatch(protectedPage, uri)) {
+				retval = true;
 			}
-		} else {
-			for (String unprotectedPage : unprotectedPages) {
-				if (isUriMatch(unprotectedPage, uri)) {
-					return false;
-				}
+		}
+
+		for (String unprotectedPage : unprotectedPages) {
+			if (isUriExactMatch(unprotectedPage, uri)) {
+				return false;
+			} else if (isUriMatch(unprotectedPage, uri)) {
+				retval = false;
 			}
 		}
 
@@ -724,5 +726,16 @@ public final class CsrfGuard implements Serializable {
 
 		return retval;
 	}
-	
+
+	private boolean isUriExactMatch(String testPath, String requestPath) {
+		boolean retval = false;
+
+		/** Case 1: Exact Match **/
+		if (testPath.equals(requestPath)) {
+			retval = true;
+		}
+
+		return retval;
+	}
+
 }
