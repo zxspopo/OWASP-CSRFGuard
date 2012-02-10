@@ -26,7 +26,7 @@ public class InterceptRedirectResponse extends HttpServletResponseWrapper {
 	@Override
 	public void sendRedirect(String location) throws IOException {
 		/** ensure token included in redirects **/
-		if (!location.contains("://") && !(csrfGuard.isUnprotectedPage(location) || csrfGuard.isUnprotectedMethod("GET"))) {
+		if (!location.contains("://") && (csrfGuard.isProtectedPage(location) || csrfGuard.isUnprotectedMethod("GET"))) {
 			/** update tokens **/
 			csrfGuard.updateTokens(request);
 			

@@ -48,6 +48,8 @@ public final class CsrfGuard implements Serializable {
 	
 	private final static String ACTION_PREFIX = "org.owasp.csrfguard.action.";
 	
+	private final static String PROTECTED_PAGE_PREFIX = "org.owasp.csrfguard.protected.";
+	
 	private final static String UNPROTECTED_PAGE_PREFIX = "org.owasp.csrfguard.unprotected.";
 	
 	private ILogger logger = null;
@@ -70,7 +72,11 @@ public final class CsrfGuard implements Serializable {
 	
 	private boolean ajax = false;
 	
+	private boolean protect = false;
+	
 	private String sessionKey = null;
+	
+	private Set<String> protectedPages = null;
 	
 	private Set<String> unprotectedPages = null;
 
@@ -107,6 +113,7 @@ public final class CsrfGuard implements Serializable {
 		}
 		csrfGuard.setSessionKey(properties.getProperty("org.owasp.csrfguard.SessionKey", "OWASP_CSRFGUARD_KEY"));
 		csrfGuard.setAjax(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.Ajax", "false")));
+		csrfGuard.setProtect(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.Protect", "false")));
 
 		/** first pass: instantiate actions **/
 		Map<String, IAction> actionsMap = new HashMap<String, IAction>();
@@ -160,9 +167,21 @@ public final class CsrfGuard implements Serializable {
 			throw new IOException("failure to define at least one action");
 		}
 
-		/** initialize unprotected pages **/
+		/** initialize protected, unprotected pages **/
 		for (Object obj : properties.keySet()) {
 			String key = (String) obj;
+			
+			if (key.startsWith(PROTECTED_PAGE_PREFIX)) {
+				String directive = key.substring(PROTECTED_PAGE_PREFIX.length());
+				int index = directive.indexOf('.');
+
+				/** page name/class **/
+				if (index < 0) {
+					String pageUri = properties.getProperty(key);
+					
+					csrfGuard.getProtectedPages().add(pageUri);
+				}
+			}
 
 			if (key.startsWith(UNPROTECTED_PAGE_PREFIX)) {
 				String directive = key.substring(UNPROTECTED_PAGE_PREFIX.length());
@@ -190,6 +209,7 @@ public final class CsrfGuard implements Serializable {
 
 	public CsrfGuard() {
 		actions = new ArrayList<IAction>();
+		protectedPages = new HashSet<String>();
 		unprotectedPages = new HashSet<String>();
 		protectedMethods = new HashSet<String>();
 	}
@@ -274,12 +294,24 @@ public final class CsrfGuard implements Serializable {
 		this.ajax = ajax;
 	}
 
+	public boolean isProtectEnabled() {
+		return protect;
+	}
+
+	public void setProtect(boolean protect) {
+		this.protect = protect;
+	}
+
 	public String getSessionKey() {
 		return sessionKey;
 	}
 
 	public void setSessionKey(String sessionKey) {
 		this.sessionKey = sessionKey;
+	}
+
+	public Set<String> getProtectedPages() {
+		return protectedPages;
 	}
 
 	public Set<String> getUnprotectedPages() {
@@ -459,7 +491,7 @@ public final class CsrfGuard implements Serializable {
 		sb.append("\");\r\n");
 
 		/** only include token if needed **/
-		if (!isUnprotectedPage(landingPage)) {
+		if (isProtectedPage(landingPage)) {
 			sb.append("var hiddenField = document.createElement(\"input\");\r\n");
 			sb.append("hiddenField.setAttribute(\"type\", \"hidden\");\r\n");
 			sb.append("hiddenField.setAttribute(\"name\", \"");
@@ -612,16 +644,25 @@ public final class CsrfGuard implements Serializable {
 		}
 	}
 
-	public boolean isUnprotectedPage(String uri) {
-		boolean retval = false;
+	public boolean isProtectedPage(String uri) {
+		boolean retval = !isProtectEnabled();
 
-		for (String unprotectedPage : unprotectedPages) {
-			if (isUriMatch(unprotectedPage, uri)) {
+		for (String protectedPage : protectedPages) {
+			if (isUriExactMatch(protectedPage, uri)) {
+				return true;
+			} else if (isUriMatch(protectedPage, uri)) {
 				retval = true;
-				break;
 			}
 		}
-		
+
+		for (String unprotectedPage : unprotectedPages) {
+			if (isUriExactMatch(unprotectedPage, uri)) {
+				return false;
+			} else if (isUriMatch(unprotectedPage, uri)) {
+				retval = false;
+			}
+		}
+
 		return retval;
 	}
 
@@ -636,7 +677,7 @@ public final class CsrfGuard implements Serializable {
 	}
 
   public boolean isUnprotectedPageOrMethod(HttpServletRequest request) {
-    return (isUnprotectedPage(request.getRequestURI()) || isUnprotectedMethod(request.getMethod()));
+    return (!isProtectedPage(request.getRequestURI()) || isUnprotectedMethod(request.getMethod()));
   }
 
 	/**
@@ -685,5 +726,16 @@ public final class CsrfGuard implements Serializable {
 
 		return retval;
 	}
-	
+
+	private boolean isUriExactMatch(String testPath, String requestPath) {
+		boolean retval = false;
+
+		/** Case 1: Exact Match **/
+		if (testPath.equals(requestPath)) {
+			retval = true;
+		}
+
+		return retval;
+	}
+
 }
