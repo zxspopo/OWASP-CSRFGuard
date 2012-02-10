@@ -5,59 +5,54 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.Properties;
+
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 import org.owasp.csrfguard.util.Streams;
 
-public class CsrfGuardListener implements HttpSessionListener {
+public class CsrfGuardServletContextListener implements ServletContextListener {
 
 	private final static String CONFIG_PARAM = "Owasp.CsrfGuard.Config";
-	
+
 	private final static String CONFIG_PRINT_PARAM = "Owasp.CsrfGuard.Config.Print";
-	
-	@Override
-	public void sessionCreated(HttpSessionEvent event) {
-		HttpSession session = event.getSession();
-		CsrfGuard csrfGuard = newInstance(session.getServletContext());
-		
-		session.setAttribute(CsrfGuard.SESSION_KEY, csrfGuard);
-		csrfGuard.updateToken(session);
-	}
 
 	@Override
-	public void sessionDestroyed(HttpSessionEvent event) {
-		/** nothing to do **/
-	}
-	
-	private CsrfGuard newInstance(ServletContext context) {
-		CsrfGuard csrfGuard = null;
+	public void contextInitialized(ServletContextEvent event) {
+		ServletContext context = event.getServletContext();
 		String config = context.getInitParameter(CONFIG_PARAM);
-		
+
+
 		if (config == null) {
 			throw new RuntimeException(String.format("failure to specify context init-param - %s", CONFIG_PARAM));
 		}
 
 		InputStream is = null;
+		Properties properties = new Properties();
 
 		try {
 			is = getResourceStream(config, context);
-			csrfGuard = CsrfGuard.newInstance(is);
+			properties.load(is);
+			CsrfGuard.load(properties);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
 			Streams.close(is);
 		}
 
+
 		String printConfig = context.getInitParameter(CONFIG_PRINT_PARAM);
 
 		if (printConfig != null && Boolean.parseBoolean(printConfig)) {
-			context.log(String.valueOf(csrfGuard));
+			context.log(CsrfGuard.getInstance().toString());
 		}
-		
-		return csrfGuard;
+	}
+
+	@Override
+	public void contextDestroyed(ServletContextEvent event) {
+		/** nothing to do **/
 	}
 
 	private InputStream getResourceStream(String resourceName, ServletContext context) throws IOException {

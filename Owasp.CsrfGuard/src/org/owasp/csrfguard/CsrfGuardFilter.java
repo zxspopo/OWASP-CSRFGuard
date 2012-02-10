@@ -52,7 +52,7 @@ public final class CsrfGuardFilter implements Filter {
 			HttpServletRequest httpRequest = (HttpServletRequest) request;
 			HttpSession session = httpRequest.getSession(true);
 
-			CsrfGuard csrfGuard = (CsrfGuard)session.getAttribute(CsrfGuard.SESSION_KEY);
+			CsrfGuard csrfGuard = CsrfGuard.getInstance();
 			csrfGuard.getLogger().log(String.format("CsrfGuard analyzing request %s", httpRequest.getRequestURI()));
 
 			InterceptRedirectResponse httpResponse = new InterceptRedirectResponse((HttpServletResponse) response, httpRequest, csrfGuard);

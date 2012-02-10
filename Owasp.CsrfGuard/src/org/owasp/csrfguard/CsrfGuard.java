@@ -38,38 +38,34 @@ import org.owasp.csrfguard.action.*;
 import org.owasp.csrfguard.log.*;
 import org.owasp.csrfguard.util.*;
 
-public final class CsrfGuard implements Serializable {
+public final class CsrfGuard {
 
-	private static final long serialVersionUID = 2621580348137545167L;
-
-	public final static String SESSION_KEY = "Owasp_CsrfGuard_Session_Key";
-	
 	public final static String PAGE_TOKENS_KEY = "Owasp_CsrfGuard_Pages_Tokens_Key";
-	
+
 	private final static String ACTION_PREFIX = "org.owasp.csrfguard.action.";
-	
+
 	private final static String PROTECTED_PAGE_PREFIX = "org.owasp.csrfguard.protected.";
 	
 	private final static String UNPROTECTED_PAGE_PREFIX = "org.owasp.csrfguard.unprotected.";
-	
+
 	private ILogger logger = null;
-	
+
 	private String tokenName = null;
-	
+
 	private int tokenLength = -1;
-	
+
 	private boolean rotate = false;
-	
+
 	private boolean tokenPerPage = false;
-	
+
 	private boolean tokenPerPagePrecreate;
-	
+
 	private SecureRandom prng = null;
-	
+
 	private String newTokenLandingPage = null;
-	
+
 	private boolean useNewTokenLandingPage = false;
-	
+
 	private boolean ajax = false;
 	
 	private boolean protect = false;
@@ -77,23 +73,23 @@ public final class CsrfGuard implements Serializable {
 	private String sessionKey = null;
 	
 	private Set<String> protectedPages = null;
-	
+
 	private Set<String> unprotectedPages = null;
 
 	private Set<String> protectedMethods = null;
 
 	private List<IAction> actions = null;
-
-	public static CsrfGuard newInstance(InputStream inputStream) throws NoSuchAlgorithmException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
-		Properties properties = new Properties();
-
-		properties.load(inputStream);
-
-		return newInstance(properties);
+	
+	private static class SingletonHolder {
+	  public static final CsrfGuard instance = new CsrfGuard();
 	}
 
-	public static CsrfGuard newInstance(Properties properties) throws NoSuchAlgorithmException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
-		CsrfGuard csrfGuard = new CsrfGuard();
+	public static CsrfGuard getInstance() {
+		return SingletonHolder.instance;
+	}
+
+	public static void load(Properties properties) throws NoSuchAlgorithmException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
+		CsrfGuard csrfGuard = SingletonHolder.instance;
 
 		/** load simple properties **/
 		csrfGuard.setLogger((ILogger) Class.forName(properties.getProperty("org.owasp.csrfguard.Logger", "org.owasp.csrfguard.log.ConsoleLogger")).newInstance());
@@ -203,8 +199,6 @@ public final class CsrfGuard implements Serializable {
 				csrfGuard.getProtectedMethods().add(method.trim());
 			}
 		}
-
-		return csrfGuard;
 	}
 
 	public CsrfGuard() {
@@ -218,7 +212,7 @@ public final class CsrfGuard implements Serializable {
 		return logger;
 	}
 
-	public void setLogger(ILogger logger) {
+	private void setLogger(ILogger logger) {
 		this.logger = logger;
 	}
 
@@ -226,7 +220,7 @@ public final class CsrfGuard implements Serializable {
 		return tokenName;
 	}
 
-	public void setTokenName(String tokenName) {
+	private void setTokenName(String tokenName) {
 		this.tokenName = tokenName;
 	}
 
@@ -234,7 +228,7 @@ public final class CsrfGuard implements Serializable {
 		return tokenLength;
 	}
 
-	public void setTokenLength(int tokenLength) {
+	private void setTokenLength(int tokenLength) {
 		this.tokenLength = tokenLength;
 	}
 
@@ -242,7 +236,7 @@ public final class CsrfGuard implements Serializable {
 		return rotate;
 	}
 
-	public void setRotate(boolean rotate) {
+	private void setRotate(boolean rotate) {
 		this.rotate = rotate;
 	}
 
@@ -250,7 +244,7 @@ public final class CsrfGuard implements Serializable {
 		return tokenPerPage;
 	}
 
-	public void setTokenPerPage(boolean tokenPerPage) {
+	private void setTokenPerPage(boolean tokenPerPage) {
 		this.tokenPerPage = tokenPerPage;
 	}
 
@@ -258,7 +252,7 @@ public final class CsrfGuard implements Serializable {
 		return tokenPerPagePrecreate;
 	}
 
-	public void setTokenPerPagePrecreate(boolean tokenPerPagePrecreate) {
+	private void setTokenPerPagePrecreate(boolean tokenPerPagePrecreate) {
 		this.tokenPerPagePrecreate = tokenPerPagePrecreate;
 	}
 
@@ -266,7 +260,7 @@ public final class CsrfGuard implements Serializable {
 		return prng;
 	}
 
-	public void setPrng(SecureRandom prng) {
+	private void setPrng(SecureRandom prng) {
 		this.prng = prng;
 	}
 
@@ -274,15 +268,15 @@ public final class CsrfGuard implements Serializable {
 		return newTokenLandingPage;
 	}
 
-	public void setNewTokenLandingPage(String newTokenLandingPage) {
+	private void setNewTokenLandingPage(String newTokenLandingPage) {
 		this.newTokenLandingPage = newTokenLandingPage;
 	}
-	
+
 	public boolean isUseNewTokenLandingPage() {
 		return useNewTokenLandingPage;
 	}
 
-	public void setUseNewTokenLandingPage(boolean useNewTokenLandingPage) {
+	private void setUseNewTokenLandingPage(boolean useNewTokenLandingPage) {
 		this.useNewTokenLandingPage = useNewTokenLandingPage;
 	}
 
@@ -290,7 +284,7 @@ public final class CsrfGuard implements Serializable {
 		return ajax;
 	}
 
-	public void setAjax(boolean ajax) {
+	private void setAjax(boolean ajax) {
 		this.ajax = ajax;
 	}
 
@@ -306,7 +300,7 @@ public final class CsrfGuard implements Serializable {
 		return sessionKey;
 	}
 
-	public void setSessionKey(String sessionKey) {
+	private void setSessionKey(String sessionKey) {
 		this.sessionKey = sessionKey;
 	}
 
@@ -326,7 +320,7 @@ public final class CsrfGuard implements Serializable {
 	public List<IAction> getActions() {
 		return actions;
 	}
-	
+
 	public String getTokenValue(HttpServletRequest request) {
 		return getTokenValue(request, request.getRequestURI());
 	}
@@ -356,7 +350,7 @@ public final class CsrfGuard implements Serializable {
 
 		return tokenValue;
 	}
-	
+
 	public boolean isValidRequest(HttpServletRequest request, HttpServletResponse response) {
 		boolean valid = isUnprotectedPageOrMethod(request);
 		HttpSession session = request.getSession(true);
@@ -394,11 +388,9 @@ public final class CsrfGuard implements Serializable {
 			/** unprotected page - nothing to do **/
 		}
 
-		/** update session with csrfguard **/
-		session.setAttribute(CsrfGuard.SESSION_KEY, this);
 		return valid;
 	}
-	
+
 	public void updateToken(HttpSession session) {
 		String tokenValue = (String) session.getAttribute(getSessionKey());
 
@@ -440,7 +432,7 @@ public final class CsrfGuard implements Serializable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Create page token if it doesn't exist.
 	 * @param pageTokens A map of tokens. If token doesn't exist it will be added.
@@ -460,8 +452,7 @@ public final class CsrfGuard implements Serializable {
 			throw new RuntimeException(String.format("unable to generate the random token - %s", e.getLocalizedMessage()), e);
 		}
 	}
-	
-	
+
 	public void writeLandingPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String landingPage = getNewTokenLandingPage();
 
@@ -675,11 +666,11 @@ public final class CsrfGuard implements Serializable {
 
 		return retval;
 	}
-
-  public boolean isUnprotectedPageOrMethod(HttpServletRequest request) {
-    return (!isProtectedPage(request.getRequestURI()) || isUnprotectedMethod(request.getMethod()));
-  }
-
+	
+	public boolean isUnprotectedPageOrMethod(HttpServletRequest request) {
+		return (!isProtectedPage(request.getRequestURI()) || isUnprotectedMethod(request.getMethod()));
+	}
+	
 	/**
 	 * FIXME: taken from Tomcat - ApplicationFilterFactory
 	 * 

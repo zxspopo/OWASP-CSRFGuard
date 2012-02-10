@@ -43,5 +43,5 @@ public class CsrfGuardException extends Exception {
 	public CsrfGuardException(String msg, Exception e) {
 		super(msg, e);
 	}
-	
+
 }
