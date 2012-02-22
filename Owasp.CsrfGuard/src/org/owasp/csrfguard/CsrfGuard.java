@@ -88,7 +88,7 @@ public final class CsrfGuard {
 		return SingletonHolder.instance;
 	}
 
-	public static void load(Properties properties) throws NoSuchAlgorithmException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
+	public static void load(Properties properties) throws NoSuchAlgorithmException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, NoSuchProviderException {
 		CsrfGuard csrfGuard = SingletonHolder.instance;
 
 		/** load simple properties **/
@@ -98,7 +98,7 @@ public final class CsrfGuard {
 		csrfGuard.setRotate(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.Rotate", "false")));
 		csrfGuard.setTokenPerPage(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.TokenPerPage", "false")));
 		csrfGuard.setTokenPerPagePrecreate(Boolean.valueOf(properties.getProperty("org.owasp.csrfguard.TokenPerPagePrecreate", "false")));
-		csrfGuard.setPrng(SecureRandom.getInstance(properties.getProperty("org.owasp.csrfguard.PRNG", "SHA1PRNG")));
+		csrfGuard.setPrng(SecureRandom.getInstance(properties.getProperty("org.owasp.csrfguard.PRNG", "SHA1PRNG"), properties.getProperty("org.owasp.csrfguard.PRNG.Provider", "SUN")));
 		csrfGuard.setNewTokenLandingPage(properties.getProperty("org.owasp.csrfguard.NewTokenLandingPage"));
 
 		//default to false if newTokenLandingPage is not set; default to true if set.
