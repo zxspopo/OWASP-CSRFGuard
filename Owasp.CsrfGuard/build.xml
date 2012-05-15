@@ -12,6 +12,7 @@
 		<property name="dist.dir" location="${basedir}/dist" />
 		<property name="dist.jar" location="${basedir}/dist/${project.name}.jar" />
 		<property name="dist.source.jar" location="${basedir}/dist/${project.name}-sources.jar" />
+		<property name="dist-with-sources.jar" location="${basedir}/dist/${project.name}-with-sources.jar" />
 		<property name="lib.dir" location="${basedir}/lib" />
 		<property name="conf.dir" location="${basedir}/conf"/>
 		<property name="license.file" location="${conf.dir}/License.txt" />
@@ -57,6 +58,15 @@
 		</jar>
 
 		<jar basedir="${src.dir}" jarfile="${dist.source.jar}">
+			<manifest>
+				<attribute name="Project-Lead" value="Eric Sheridan (eric@infraredsecurity.com)"/>
+				<attribute name="Version" value="${project.version}.${build.number}"/>
+			</manifest>
+		</jar>
+
+		<jar jarfile="${dist-with-sources.jar}" duplicate="fail">
+			<zipfileset src="${dist.source.jar}" />
+			<zipfileset src="${dist.jar}" />
 			<manifest>
 				<attribute name="Project-Lead" value="Eric Sheridan (eric@infraredsecurity.com)"/>
 				<attribute name="Version" value="${project.version}.${build.number}"/>
