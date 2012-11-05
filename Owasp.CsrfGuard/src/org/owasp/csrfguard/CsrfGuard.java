@@ -352,7 +352,7 @@ public final class CsrfGuard {
 	}
 
 	public boolean isValidRequest(HttpServletRequest request, HttpServletResponse response) {
-		boolean valid = isUnprotectedPageOrMethod(request);
+		boolean valid = !isProtectedPageAndMethod(request);
 		HttpSession session = request.getSession(true);
 		String tokenFromSession = (String) session.getAttribute(getSessionKey());
 
@@ -426,7 +426,7 @@ public final class CsrfGuard {
 				}
 
 				/** create token if it does not exist **/
-				if (!isUnprotectedPageOrMethod(request)) {
+				if (isProtectedPageAndMethod(request)) {
 					createPageToken(pageTokens, request.getRequestURI());
 				}
 			}
@@ -657,18 +657,22 @@ public final class CsrfGuard {
 		return retval;
 	}
 
-	public boolean isUnprotectedMethod(String method) {
+	public boolean isProtectedMethod(String method) {
 		boolean retval = false;
 
-		if (!protectedMethods.isEmpty() && !protectedMethods.contains(method)) {
+		if (protectedMethods.isEmpty() || protectedMethods.contains(method)) {
 				retval = true;
 		}
 
 		return retval;
 	}
 	
-	public boolean isUnprotectedPageOrMethod(HttpServletRequest request) {
-		return (!isProtectedPage(request.getRequestURI()) || isUnprotectedMethod(request.getMethod()));
+	public boolean isProtectedPageAndMethod(String page, String method) {
+		return (isProtectedPage(page) && isProtectedMethod(method));
+	}
+	
+	public boolean isProtectedPageAndMethod(HttpServletRequest request) {
+		return isProtectedPageAndMethod(request.getRequestURI(), request.getMethod());
 	}
 	
 	/**
