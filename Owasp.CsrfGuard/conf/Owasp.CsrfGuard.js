@@ -202,38 +202,27 @@
 		return result;
 	}
 
+	function getHost(url) {
+		if (/\bMSIE 6/.test(navigator.userAgent) && !window.opera) {
+			url = canonicalizeUrl(url); // damn you, ie6
+		}
+		var a =  document.createElement('a');
+		a.href = url;
+		return a.host; // will return hostname without port!
+	}
+	
+	function canonicalizeUrl(url) { // https://gist.github.com/2428561#gistcomment-306549
+		var div = document.createElement('div');
+		div.innerHTML = "<a></a>";
+		div.firstChild.href = url;
+		div.innerHTML = div.innerHTML;
+		return div.firstChild.href;
+	}
+
 	/** determine if uri/url points to valid domain **/
 	function isValidUrl(src) {
-		var result = false;
-		
-		/** parse out domain to make sure it points to our own **/
-		if(src.substring(0, 7) == "http://" || src.substring(0, 8) == "https://") {
-			var token = "://";
-			var index = src.indexOf(token);
-			var part = src.substring(index + token.length);
-			var domain = "";
-			
-			/** parse up to end, first slash, or anchor **/
-			for(var i=0; i<part.length; i++) {
-				var character = part.charAt(i);
-				
-				if(character == '/' || character == ':' || character == '#') {
-					break;
-				} else {
-					domain += character;
-				}
-			}
-			
-			result = isValidDomain(document.domain, domain);
-			/** explicitly skip anchors **/
-		} else if(src.charAt(0) == '#') {
-			result = false;
-			/** ensure it is a local resource without a protocol **/
-		} else if(!src.startsWith("//") && (src.charAt(0) == '/' || src.indexOf(':') == -1)) {
-			result = true;
-		}
-		
-		return result;
+		var urlHost = getHost(url);
+		return isValidDomain(document.domain, urlHost);
 	}
 
 	/** parse uri from url **/
