@@ -208,7 +208,7 @@
 		}
 		var a =  document.createElement('a');
 		a.href = url;
-		return a.host; // will return hostname without port!
+		return a.hostname; // will return hostname without port!
 	}
 	
 	function canonicalizeUrl(url) { // https://gist.github.com/2428561#gistcomment-306549
@@ -221,7 +221,7 @@
 
 	/** determine if uri/url points to valid domain **/
 	function isValidUrl(src) {
-		var urlHost = getHost(url);
+		var urlHost = getHost(src);
 		return isValidDomain(document.domain, urlHost);
 	}
 
