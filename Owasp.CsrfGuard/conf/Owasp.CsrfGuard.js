@@ -317,7 +317,7 @@
 		var all = document.all ? document.all : document.getElementsByTagName('*');
 		var len = all.length;
 
-		for(var i=0; i<len; i++) {
+		for(var i=len-1; i>=0; i--) {
 			var element = all[i];
 			
 			/** inject into form **/
