@@ -678,9 +678,9 @@ public final class CsrfGuard {
 	/**
 	 * FIXME: taken from Tomcat - ApplicationFilterFactory
 	 * 
-	 * @param testPath
-	 * @param requestPath
-	 * @return
+	 * @param testPath the pattern to match.
+	 * @param requestPath the current request path.
+	 * @return {@code true} if {@code requestPath} matches {@code testPath}.
 	 */
 	private boolean isUriMatch(String testPath, String requestPath) {
 		boolean retval = false;
