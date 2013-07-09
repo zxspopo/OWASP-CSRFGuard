@@ -1,3 +1,9 @@
-Owasp.CsrfGuard/bin
-Owasp.CsrfGuard/dist
-Owasp.CsrfGuard.Test/WebContent/WEB-INF/lib/Owasp.CsrfGuard.jar
+/csrfguard/.settings
+/csrfguard/.classpath
+/csrfguard/.project
+/csrfguard/target
+/csrfguard-test/.settings
+/csrfguard-test/.classpath
+/csrfguard-test/.project
+/csrfguard-test/target
+/csrfguard-test/WEB-INF/classes
