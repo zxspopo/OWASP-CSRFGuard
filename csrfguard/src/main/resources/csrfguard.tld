@@ -43,12 +43,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		</attribute>
 	</tag>
 	<tag>
-		<name>token-name</name>
+		<name>tokenname</name>
 		<tag-class>org.owasp.csrfguard.tag.TokenNameTag</tag-class>
 		<body-content>empty</body-content>
 	</tag>
 	<tag>
-		<name>token-value</name>
+		<name>tokenvalue</name>
 		<tag-class>org.owasp.csrfguard.tag.TokenValueTag</tag-class>
 		<body-content>empty</body-content>
 		<attribute>
