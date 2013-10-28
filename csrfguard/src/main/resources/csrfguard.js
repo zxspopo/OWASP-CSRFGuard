@@ -76,6 +76,13 @@
 	    };
 	}();
 	
+	/** Prevent cross-domain websites from freezing String.prototype **/
+	if(Object.isFrozen(String.prototype)){
+		alert('OWASP CSRFGuard was disabled due to a security reason.');
+		console.log('The page which loaded this script did a Object.freeze(String.prototype), which makes OWASP CSRFGuard incompatible');
+		return;
+	}
+
 	/** string utility functions **/
 	String.prototype.startsWith = function(prefix) {
 		return this.indexOf(prefix) === 0;
