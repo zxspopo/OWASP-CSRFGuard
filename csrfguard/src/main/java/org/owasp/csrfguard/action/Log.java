@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.owasp.csrfguard.CsrfGuard;
 import org.owasp.csrfguard.CsrfGuardException;
 import org.owasp.csrfguard.log.LogLevel;
+import org.owasp.encoder.Encode;
 
 public final class Log extends AbstractAction {
 
@@ -68,7 +69,7 @@ public final class Log extends AbstractAction {
 			logMessage = logMessage.replaceAll("%user%", "<anonymous>");
 		}
 
-		csrfGuard.getLogger().log(LogLevel.Error, logMessage);
+		csrfGuard.getLogger().log(LogLevel.Error, Encode.forHtml(logMessage));
 	}
 	
 }
