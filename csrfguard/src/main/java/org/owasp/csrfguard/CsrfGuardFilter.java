@@ -41,7 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.owasp.csrfguard.http.InterceptRedirectResponse;
-import org.owasp.encoder.Encode;
 
 public final class CsrfGuardFilter implements Filter {
 
@@ -66,7 +65,7 @@ public final class CsrfGuardFilter implements Filter {
 			}
 
 			CsrfGuard csrfGuard = CsrfGuard.getInstance();
-			csrfGuard.getLogger().log(String.format("CsrfGuard analyzing request %s", Encode.forHtml(httpRequest.getRequestURI())));
+			csrfGuard.getLogger().log(String.format("CsrfGuard analyzing request %s", httpRequest.getRequestURI()));
 
 			InterceptRedirectResponse httpResponse = new InterceptRedirectResponse((HttpServletResponse) response, httpRequest, csrfGuard);
 
