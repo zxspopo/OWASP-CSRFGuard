@@ -48,11 +48,11 @@ public class InterceptRedirectResponse extends HttpServletResponseWrapper {
 			}
 
 			// remove any query parameters from the encodedLocation
-			String encodedLocationUri = encodedLocation.split("\\?", 2)[0];
+			String locationUri = encodedLocation.split("\\?", 2)[0];
 
 			sb.append(csrfGuard.getTokenName());
 			sb.append('=');
-			sb.append(csrfGuard.getTokenValue(request, encodedLocationUri));
+			sb.append(csrfGuard.getTokenValue(request, locationUri));
 			
 			response.sendRedirect(sb.toString());
 		} else {
