@@ -11,29 +11,32 @@ public class JavaLogger implements ILogger {
 
 	@Override
 	public void log(String msg) {
-		LOGGER.info(msg);
+		LOGGER.info(msg.replaceAll("(\\r|\\n)", ""));
 	}
 
 	@Override
 	public void log(LogLevel level, String msg) {
+		// Remove CR and LF characters to prevent CRLF injection
+		String encodedMsg = msg.replaceAll("(\\r|\\n)", "");
+		
 		switch(level) {
 			case Trace:
-				LOGGER.finest(msg);
+				LOGGER.finest(encodedMsg);
 				break;
 			case Debug:
-				LOGGER.fine(msg);
+				LOGGER.fine(encodedMsg);
 				break;
 			case Info:
-				LOGGER.info(msg);
+				LOGGER.info(encodedMsg);
 				break;
 			case Warning:
-				LOGGER.warning(msg);
+				LOGGER.warning(encodedMsg);
 				break;
 			case Error:
-				LOGGER.warning(msg);
+				LOGGER.warning(encodedMsg);
 				break;
 			case Fatal:
-				LOGGER.severe(msg);
+				LOGGER.severe(encodedMsg);
 				break;
 			default:
 				throw new RuntimeException("unsupported log level " + level);
@@ -70,5 +73,4 @@ public class JavaLogger implements ILogger {
 				throw new RuntimeException("unsupported log level " + level);
 		}
 	}
-
 }
