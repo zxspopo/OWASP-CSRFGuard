@@ -17,26 +17,26 @@ public class JavaLogger implements ILogger {
 	@Override
 	public void log(LogLevel level, String msg) {
 		// Remove CR and LF characters to prevent CRLF injection
-		String encodedMsg = msg.replaceAll("(\\r|\\n)", "");
+		String sanitizedMsg = msg.replaceAll("(\\r|\\n)", "");
 		
 		switch(level) {
 			case Trace:
-				LOGGER.finest(encodedMsg);
+				LOGGER.finest(sanitizedMsg);
 				break;
 			case Debug:
-				LOGGER.fine(encodedMsg);
+				LOGGER.fine(sanitizedMsg);
 				break;
 			case Info:
-				LOGGER.info(encodedMsg);
+				LOGGER.info(sanitizedMsg);
 				break;
 			case Warning:
-				LOGGER.warning(encodedMsg);
+				LOGGER.warning(sanitizedMsg);
 				break;
 			case Error:
-				LOGGER.warning(encodedMsg);
+				LOGGER.warning(sanitizedMsg);
 				break;
 			case Fatal:
-				LOGGER.severe(encodedMsg);
+				LOGGER.severe(sanitizedMsg);
 				break;
 			default:
 				throw new RuntimeException("unsupported log level " + level);
