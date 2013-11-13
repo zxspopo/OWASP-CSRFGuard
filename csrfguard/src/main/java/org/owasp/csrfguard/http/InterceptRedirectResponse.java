@@ -25,27 +25,30 @@ public class InterceptRedirectResponse extends HttpServletResponseWrapper {
 
 	@Override
 	public void sendRedirect(String location) throws IOException {
+		// Remove CR and LF characters to prevent CRLF injection
+		String sanitizedLocation = location.replaceAll("(\\r|\\n|%0D|%0A|%0a|%0d)", "");
+		
 		/** ensure token included in redirects **/
-		if (!location.contains("://") && csrfGuard.isProtectedPageAndMethod(location, "GET")) {
+		if (!sanitizedLocation.contains("://") && csrfGuard.isProtectedPageAndMethod(sanitizedLocation, "GET")) {
 			/** update tokens **/
 			csrfGuard.updateTokens(request);
 			
 			StringBuilder sb = new StringBuilder();
 
-			if (!location.startsWith("/")) {
-				sb.append(request.getContextPath() + "/" + location);
+			if (!sanitizedLocation.startsWith("/")) {
+				sb.append(request.getContextPath() + "/" + sanitizedLocation);
 			} else {
-				sb.append(location);
+				sb.append(sanitizedLocation);
 			}
 			
-			if (location.contains("?")) {
+			if (sanitizedLocation.contains("?")) {
 				sb.append('&');
 			} else {
 				sb.append('?');
 			}
 
-			// remove any query parameters from the location
-			String locationUri = location.split("\\?", 2)[0];
+			// remove any query parameters from the sanitizedLocation
+			String locationUri = sanitizedLocation.split("\\?", 2)[0];
 
 			sb.append(csrfGuard.getTokenName());
 			sb.append('=');
@@ -53,8 +56,7 @@ public class InterceptRedirectResponse extends HttpServletResponseWrapper {
 			
 			response.sendRedirect(sb.toString());
 		} else {
-			response.sendRedirect(location);
+			response.sendRedirect(sanitizedLocation);
 		}
 	}
-
 }
