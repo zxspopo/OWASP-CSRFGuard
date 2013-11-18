@@ -10,7 +10,7 @@ Welcome to the home of the OWASP CSRFGuard Project! OWASP CSRFGuard is a library
 
 ## Project Lead
 
-THE PROJECT IS IN NEED OF LEADERSHIP! Contact Samantha Groves (samantha.groves@owasp.org) if you are interested!
+This projet is now run by Azzeddine RAMRAMI. He can be reached at azzeddine.ramrami at owasp.org.
 
 ## License
 
