@@ -1,8 +1,5 @@
 package org.owasp.csrfguard;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.Properties;
@@ -10,6 +7,7 @@ import java.util.Properties;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import org.owasp.csrfguard.util.Resources;
 
 import org.owasp.csrfguard.util.Streams;
 
@@ -33,7 +31,7 @@ public class CsrfGuardServletContextListener implements ServletContextListener {
 		Properties properties = new Properties();
 
 		try {
-			is = getResourceStream(config, context);
+			is = Resources.getResourceStream(config, context, CsrfGuardServletContextListener.class);
 			properties.load(is);
 			CsrfGuard.load(properties);
 		} catch (Exception e) {
@@ -53,39 +51,6 @@ public class CsrfGuardServletContextListener implements ServletContextListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
 		/** nothing to do **/
-	}
-
-	private InputStream getResourceStream(String resourceName, ServletContext context) throws IOException {
-		InputStream is = null;
-
-		/** try classpath **/
-		is = getClass().getClassLoader().getResourceAsStream(resourceName);
-
-		/** try web context **/
-		if (is == null) {
-			String fileName = context.getRealPath(resourceName);
-			File file = new File(fileName);
-
-			if (file.exists()) {
-				is = new FileInputStream(fileName);
-			}
-		}
-
-		/** try current directory **/
-		if (is == null) {
-			File file = new File(resourceName);
-
-			if (file.exists()) {
-				is = new FileInputStream(resourceName);
-			}
-		}
-
-		/** fail if still empty **/
-		if (is == null) {
-			throw new IOException(String.format("unable to locate resource - %s", resourceName));
-		}
-
-		return is;
 	}
 
 }

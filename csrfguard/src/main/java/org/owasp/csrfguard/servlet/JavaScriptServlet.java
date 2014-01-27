@@ -88,7 +88,7 @@ public final class JavaScriptServlet extends HttpServlet {
 		injectIntoForms = getInitParameter(servletConfig, "inject-into-forms", "true");
 		injectIntoAttributes = getInitParameter(servletConfig, "inject-into-attributes", "true");
 		xRequestedWith = getInitParameter(servletConfig, "x-requested-with", "OWASP CSRFGuard Project");
-		templateCode = readFileContent(servletConfig.getServletContext().getRealPath(sourceFile));
+		templateCode = readFileContent(sourceFile, servletConfig.getServletContext());
 	}
 
 	@Override
@@ -215,12 +215,12 @@ public final class JavaScriptServlet extends HttpServlet {
 		return value;
 	}
 
-	private String readFileContent(String fileName) {
+	private String readFileContent(final String fileName, final ServletContext servletContext) {
 		StringBuilder sb = new StringBuilder();
 		InputStream is = null;
 
 		try {
-			is = new FileInputStream(fileName);
+			is = Resources.getResourceStream(fileName, servletContext, JavaScriptServlet.class);
 			int i = 0;
 
 			while ((i = is.read()) > 0) {
