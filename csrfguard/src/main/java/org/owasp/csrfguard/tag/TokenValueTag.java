@@ -40,7 +40,7 @@ public final class TokenValueTag extends AbstractUriTag {
 
 	@Override
 	public int doStartTag() {
-		CsrfGuard csrfGuard = CsrfGuard.getInstance();
+		CsrfGuard csrfGuard = CsrfGuardFactory.getCsrfGuard();
 
 		if (csrfGuard.isTokenPerPageEnabled() && getUri() == null) {
 			throw new IllegalStateException("must define 'uri' attribute when token per page is enabled");

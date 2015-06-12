@@ -40,7 +40,7 @@ public final class TokenTag extends AbstractUriTag {
 
 	@Override
 	public int doStartTag() {
-		CsrfGuard csrfGuard = CsrfGuard.getInstance();
+		CsrfGuard csrfGuard = CsrfGuardFactory.getCsrfGuard();
 		String tokenName = csrfGuard.getTokenName();
 
 		if (csrfGuard.isTokenPerPageEnabled() && getUri() == null) {

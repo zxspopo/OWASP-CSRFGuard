@@ -64,7 +64,7 @@ public final class CsrfGuardFilter implements Filter {
 				return;
 			}
 
-			CsrfGuard csrfGuard = CsrfGuard.getInstance();
+			CsrfGuard csrfGuard = CsrfGuardFactory.getCsrfGuard();
 			csrfGuard.getLogger().log(String.format("CsrfGuard analyzing request %s", httpRequest.getRequestURI()));
 
 			InterceptRedirectResponse httpResponse = new InterceptRedirectResponse((HttpServletResponse) response, httpRequest, csrfGuard);

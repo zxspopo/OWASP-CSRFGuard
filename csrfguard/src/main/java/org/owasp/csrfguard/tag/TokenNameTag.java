@@ -39,7 +39,7 @@ public final class TokenNameTag extends TagSupport {
 
 	@Override
 	public int doStartTag() {
-		String tokenName = CsrfGuard.getInstance().getTokenName();
+		String tokenName = CsrfGuardFactory.getCsrfGuard().getTokenName();
 
 		try {
 			pageContext.getOut().write(tokenName);
